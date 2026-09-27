@@ -1,6 +1,6 @@
 name: appnovasi_kit
 description: "Flutter boilerplate framework: config-only integration untuk mempercepat pembuatan app Play Store."
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/DayanLeksonoPutro/appnovasi_kit
 homepage: https://github.com/DayanLeksonoPutro/appnovasi_kit
 issue_tracker: https://github.com/DayanLeksonoPutro/appnovasi_kit/issues
@@ -27,6 +27,7 @@ dependencies:
   in_app_purchase: ^3.3.1
   intl: ^0.20.2
   package_info_plus: ^10.2.1
+  permission_handler: ^13.0.2
   provider: ^6.1.5+1
   share_plus: ^13.3.0
   url_launcher: ^6.3.2

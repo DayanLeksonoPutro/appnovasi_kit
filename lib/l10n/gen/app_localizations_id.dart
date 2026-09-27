@@ -43,4 +43,49 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get languageLabel => 'Bahasa';
+
+  @override
+  String get onboardingNext => 'Berikutnya';
+
+  @override
+  String get onboardingSkip => 'Lewati';
+
+  @override
+  String get onboardingGetStarted => 'Mulai';
+
+  @override
+  String get aboutTitle => 'Tentang';
+
+  @override
+  String get colorTheme => 'Warna tema';
+
+  @override
+  String get fontSize => 'Ukuran font';
+
+  @override
+  String get fontSmall => 'Kecil';
+
+  @override
+  String get fontNormal => 'Standar';
+
+  @override
+  String get fontLarge => 'Besar';
+
+  @override
+  String get fontFamily => 'Jenis font';
+
+  @override
+  String get darkMode => 'Mode gelap';
+
+  @override
+  String get moreApps => 'Aplikasi lainnya';
+
+  @override
+  String get website => 'Situs web';
+
+  @override
+  String get privacyPolicy => 'Kebijakan Privasi';
+
+  @override
+  String get termsOfService => 'Ketentuan Layanan';
 }

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.appnovasi.appnovasi_kit_example"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = maxOf(flutter.compileSdkVersion, 37)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

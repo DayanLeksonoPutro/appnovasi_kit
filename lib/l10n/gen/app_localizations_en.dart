@@ -43,4 +43,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageLabel => 'Language';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingGetStarted => 'Get started';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get colorTheme => 'Color theme';
+
+  @override
+  String get fontSize => 'Font size';
+
+  @override
+  String get fontSmall => 'Small';
+
+  @override
+  String get fontNormal => 'Default';
+
+  @override
+  String get fontLarge => 'Large';
+
+  @override
+  String get fontFamily => 'Font';
+
+  @override
+  String get darkMode => 'Dark mode';
+
+  @override
+  String get moreApps => 'More apps';
+
+  @override
+  String get website => 'Website';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
 }

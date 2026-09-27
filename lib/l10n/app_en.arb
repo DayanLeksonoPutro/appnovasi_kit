@@ -16,5 +16,20 @@
   "themeSystem": "System",
   "themeLight": "Light",
   "themeDark": "Dark",
-  "languageLabel": "Language"
+  "languageLabel": "Language",
+  "onboardingNext": "Next",
+  "onboardingSkip": "Skip",
+  "onboardingGetStarted": "Get started",
+  "aboutTitle": "About",
+  "colorTheme": "Color theme",
+  "fontSize": "Font size",
+  "fontSmall": "Small",
+  "fontNormal": "Default",
+  "fontLarge": "Large",
+  "fontFamily": "Font",
+  "darkMode": "Dark mode",
+  "moreApps": "More apps",
+  "website": "Website",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service"
 }

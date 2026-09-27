@@ -10,5 +10,20 @@
   "themeSystem": "Sistem",
   "themeLight": "Terang",
   "themeDark": "Gelap",
-  "languageLabel": "Bahasa"
+  "languageLabel": "Bahasa",
+  "onboardingNext": "Berikutnya",
+  "onboardingSkip": "Lewati",
+  "onboardingGetStarted": "Mulai",
+  "aboutTitle": "Tentang",
+  "colorTheme": "Warna tema",
+  "fontSize": "Ukuran font",
+  "fontSmall": "Kecil",
+  "fontNormal": "Standar",
+  "fontLarge": "Besar",
+  "fontFamily": "Jenis font",
+  "darkMode": "Mode gelap",
+  "moreApps": "Aplikasi lainnya",
+  "website": "Situs web",
+  "privacyPolicy": "Kebijakan Privasi",
+  "termsOfService": "Ketentuan Layanan"
 }

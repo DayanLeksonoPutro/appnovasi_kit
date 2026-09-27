@@ -32,6 +32,7 @@ mengedit kode internal package?"* Jika tidak, desainnya salah.
 - i18n: `flutter_localizations` + `intl` (file `.arb`)
 - Font: font bundled di package (mis. Inter/Poppins) + override lewat `AppConfig`
 - Monetisasi: `google_mobile_ads`, `in_app_purchase`
+- Permission: `permission_handler`
 - Lain: `share_plus`, `url_launcher`, `package_info_plus`
 
 > Repo ini **single package** (`appnovasi_kit`) + folder `example/`. Tidak pakai Melos
@@ -44,8 +45,8 @@ lib/
   appnovasi_kit.dart      # BARREL publik — satu-satunya pintu keluar API
   src/
     core/                 # AppConfig, AppKit, AppKitApp, DI/registry provider, util
-    services/             # storage, theme, locale, ads, iap, share, rate
-    features/             # modul feature-first (settings, ...)
+    services/             # storage, theme, locale, ads, iap, share, rate, permission
+    features/             # modul feature-first (onboarding, about, settings, ...)
     widgets/              # widget bersama (ShareButton, RateButton, AdBanner)
     routing/              # konfigurasi go_router + guard
   l10n/                   # file .arb + gen/ (generated, jangan diedit manual)
@@ -65,9 +66,17 @@ Aturan:
 Permukaan API yang boleh dipakai consumer:
 - `AppKit.initialize(AppConfig config)` — setup awal (ads, storage, iap).
 - `AppKitApp(...)` — root widget pembungkus `MaterialApp` (theme, locale, router).
-- Widget siap pakai: `ShareButton`, `RateButton`, dll.
-- Service yang diakses lewat Provider: `StorageService`, `ThemeController`,
-  `LocaleController`, `AdService`, `PurchaseService`.
+- Widget siap pakai: `ShareButton`, `RateButton`, `ShareIconButton`, `RateIconButton`
+  (untuk `AppBar.actions`), `OnboardingScreen`, `OnboardingGate`, `AppShell`,
+  `AboutScreen`, `SettingsScreen`, `AppTitle`, `AppVersionText`, dll.
+- Feature config-only: `OnboardingConfig` + `OnboardingPage` (dipasang lewat `AppConfig.onboarding`);
+  `BottomNavConfig` + `NavTab` (dipasang lewat `AppConfig.navigation`).
+- Routing: `AppRouter.create` (manual) & `AppRouter.createShell` (bottom nav
+  `StatefulShellRoute.indexedStack`).
+- Service yang diakses lewat Provider: `StorageService`, `ThemeController`
+  (mode light/dark/system + `AppColorTheme`), `LocaleController`, `AdService`,
+  `PurchaseService`, `PermissionService`, `LinkService` (url_launcher),
+  `AppInfoService` (package_info_plus).
 
 Aturan:
 - Menambah item baru = **non-breaking**.
@@ -77,13 +86,18 @@ Aturan:
 
 Semua nilai yang berbeda antar-app HARUS lewat `AppConfig`, tidak boleh hardcode di `lib/`:
 
-- `appName`, `packageId`
-- Theme: `seedColor`, `lightTheme`, `darkTheme`
-- Font: `fontFamily` (default dari package, consumer boleh override)
+- `appName`, `packageId`, `description`, `logoAsset`
+- Theme: `seedColor`, `colorThemes` (set warna universal bawaan `defaultColorThemes`),
+  `lightTheme`, `darkTheme`
+- Font: `fontFamily` (default dari package, consumer boleh override), `fonts`
+  (`AppFont`; default `defaultFonts`), `defaultFontSize` (`AppFontSize`)
 - Locale: `supportedLocales`, `defaultLocale`
 - AdMob: `bannerUnitId`, `interstitialUnitId`, `appOpenUnitId`, (android/ios terpisah)
 - IAP: daftar `productIds`
-- Store: `playStoreUrl`, `appStoreUrl`, `privacyPolicyUrl`, `termsUrl`
+- Store: `playStoreUrl`, `appStoreUrl`, `moreAppsUrl`, `websiteUrl`,
+  `privacyPolicyUrl`, `termsUrl`
+- Onboarding: `onboarding` (`OnboardingConfig` berisi daftar `OnboardingPage`)
+- Bottom nav: `navigation` (`BottomNavConfig` berisi daftar `NavTab`)
 
 Package sudah menyediakan **theme default & font bundled**, jadi consumer hanya perlu
 mengoverride lewat `AppConfig` bila ingin berbeda (config-only).
@@ -168,21 +182,54 @@ Contoh `example/` adalah bukti integrasi. Alur tiap project baru:
      bannerUnitId: 'ca-app-pub-xxx/yyy',
      productIds: ['remove_ads'],
      playStoreUrl: 'https://play.google.com/store/apps/details?id=...',
+     onboarding: OnboardingConfig(
+       pages: [
+         OnboardingPage(
+           title: 'Selamat datang',
+           description: 'Jelajahi fitur utama aplikasi.',
+           icon: Icons.waving_hand,
+         ),
+       ],
+     ),
+     navigation: BottomNavConfig(
+       tabs: [
+         NavTab(label: 'Home', icon: Icons.home_outlined, path: '/home'),
+         NavTab(label: 'Settings', icon: Icons.settings_outlined, path: '/settings'),
+       ],
+     ),
    );
    ```
+   Onboarding otomatis tampil sekali di awal saat `AppKitApp(home: ...)` dipakai;
+   bisa juga dipasang manual lewat `OnboardingGate`. Cek/ajukan izin lewat
+   `context.read<PermissionService>()`, mis. `ensure(Permission.camera)`.
+   Bila `navigation` diisi, `AppKitApp` membangun `StatefulShellRoute.indexedStack`
+   otomatis dari daftar `NavTab` + `routes` (tiap tab butuh route dengan path sama).
 4. `main.dart` tipis:
    ```dart
    Future<void> main() async {
      await AppKit.initialize(appConfig);
-     runApp(const AppKitApp(config: appConfig, home: HomePage()));
+     runApp(
+       AppKitApp(
+         config: appConfig,
+         routes: {
+           '/home': (context) => const HomePage(),
+           '/settings': (context) => const SettingsPage(),
+         },
+       ),
+     );
    }
    ```
+   Tanpa `navigation`, cukup `AppKitApp(config: appConfig, home: HomePage())`.
 5. Pakai widget/service siap pakai, mis. `ShareButton`, `RateButton`, `AdBanner`,
+   `AboutScreen`, `SettingsScreen`, `AppTitle` (judul appbar "NamaApp versi"),
    `context.read<ThemeController>().toggle()`, `context.read<LocaleController>()`.
 
 Langkah native yang tetap manual per-project (tidak bisa di package):
 - AdMob **App ID** di `AndroidManifest.xml` (`com.google.android.gms.ads.APPLICATION_ID`)
   dan `Info.plist` (`GADApplicationIdentifier`).
+- Permission `permission_handler`: deklarasikan `<uses-permission>` di `AndroidManifest.xml`
+  dan usage description (mis. `NSCameraUsageDescription`) di `Info.plist` sesuai kebutuhan.
+  Set `compileSdk` Android minimal 37 (`compileSdk = maxOf(flutter.compileSdkVersion, 37)`).
 - Activity/billing product ID di Play Console, keystore/signing.
 
 ## 14. Pending decisions (perlu diisi saat setup)

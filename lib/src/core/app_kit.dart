@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../services/ad_service.dart';
+import '../services/app_info_service.dart';
 import '../services/storage_service.dart';
 import 'app_config.dart';
 
@@ -10,6 +11,7 @@ class AppKit {
 
   static late final AppConfig config;
   static late final StorageService storage;
+  static AppInfoService? appInfo;
   static bool _initialized = false;
 
   static bool get isInitialized => _initialized;
@@ -20,6 +22,7 @@ class AppKit {
     await Hive.initFlutter();
     storage = StorageService();
     await storage.init();
+    appInfo = await AppInfoService.load();
     await AdService.initialize(config);
     _initialized = true;
   }
