@@ -1,0 +1,14 @@
+{
+  "@@locale": "id",
+  "shareMessage": "Cek aplikasi {appName}!",
+  "share": "Bagikan",
+  "rate": "Beri Rating",
+  "rateTitle": "Beri rating aplikasi ini",
+  "rateMessage": "Jika Anda menikmati aplikasi ini, luangkan waktu untuk memberi rating. Terima kasih atas dukungannya!",
+  "settingsTitle": "Pengaturan",
+  "themeLabel": "Tema",
+  "themeSystem": "Sistem",
+  "themeLight": "Terang",
+  "themeDark": "Gelap",
+  "languageLabel": "Bahasa"
+}

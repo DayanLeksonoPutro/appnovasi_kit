@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "shareMessage": "Check out {appName}!",
+  "@shareMessage": {
+    "description": "Default text shared when tapping the share button",
+    "placeholders": {
+      "appName": { "type": "String" }
+    }
+  },
+  "share": "Share",
+  "rate": "Rate",
+  "rateTitle": "Rate this app",
+  "rateMessage": "If you enjoy using this app, please take a moment to rate it. Thank you for your support!",
+  "settingsTitle": "Settings",
+  "themeLabel": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "languageLabel": "Language"
+}
