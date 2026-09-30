@@ -10,28 +10,30 @@ import 'package:provider/provider.dart';
 Widget _pump(
   Widget child, {
   required StorageService storage,
-  AppConfig config = const AppConfig(
-    appName: 'Demo App',
-    packageId: 'com.demo',
-  ),
+  AppConfig? config,
   AppInfoService info = const AppInfoService(
     version: '1.2.3',
     buildNumber: '45',
   ),
 }) {
+  final resolvedConfig = config ?? AppConfig(
+    appName: 'Demo App',
+    packageId: 'com.demo',
+  );
+
   return MultiProvider(
     providers: [
-      Provider<AppConfig>.value(value: config),
+      Provider<AppConfig>.value(value: resolvedConfig),
       Provider<AppInfoService>.value(value: info),
       Provider<StorageService>.value(value: storage),
       ChangeNotifierProvider<ThemeController>(
-        create: (_) => ThemeController(storage, config),
+        create: (_) => ThemeController(storage, resolvedConfig),
       ),
       ChangeNotifierProvider<LocaleController>(
-        create: (_) => LocaleController(storage, config),
+        create: (_) => LocaleController(storage, resolvedConfig),
       ),
-      Provider<ShareService>(create: (_) => ShareService(config)),
-      Provider<RateService>(create: (_) => RateService(config)),
+      Provider<ShareService>(create: (_) => ShareService(resolvedConfig)),
+      Provider<RateService>(create: (_) => RateService(resolvedConfig)),
       Provider<LinkService>(create: (_) => const LinkService()),
     ],
     child: MaterialApp(
@@ -57,8 +59,64 @@ void main() {
     await dir.delete(recursive: true);
   });
 
+  test('AppConfig supports BrandConfig and ThemeConfig objects', () {
+    final config = AppConfig(
+      brand: BrandConfig(
+        appName: 'NusaPay',
+        packageId: 'com.nusapay.app',
+        slogan: 'Mudah bayar, aman, cepat',
+      ),
+      theme: ThemeConfig(
+        primary: Color(0xFF0F766E),
+        primaryContainer: Color(0xFFCCFBF1),
+        secondary: Color(0xFFEC4899),
+        background: Color(0xFFF8FAFC),
+        surface: Colors.white,
+        surfaceVariant: Color(0xFFE2E8F0),
+        success: Color(0xFF16A34A),
+        warning: Color(0xFFF59E0B),
+        error: Color(0xFFDC2626),
+        textPrimary: Color(0xFF0F172A),
+        textSecondary: Color(0xFF475569),
+      ),
+    );
+
+    expect(config.brand.appName, 'NusaPay');
+    expect(config.brand.packageId, 'com.nusapay.app');
+    expect(config.theme.primary, const Color(0xFF0F766E));
+    expect(config.appName, 'NusaPay');
+    expect(config.packageId, 'com.nusapay.app');
+  });
+
+  test('AppConfig supports localized ContentConfig values', () {
+    final config = AppConfig(
+      appName: 'Demo',
+      packageId: 'com.demo',
+      content: ContentConfig(
+        welcomeTitle: LocalizedText({'en': 'Welcome', 'id': 'Selamat datang'}),
+        heroTitle: LocalizedText({
+          'en': 'Manage everything in one place',
+          'id': 'Kelola semuanya dalam satu tempat',
+        }),
+        appDescription: LocalizedText({
+          'en': 'A modern app for daily life.',
+          'id': 'Aplikasi modern untuk kehidupan sehari-hari.',
+        }),
+      ),
+    );
+
+    expect(config.content.welcomeTitleFor(const Locale('en')), 'Welcome');
+    expect(config.content.welcomeTitleFor(const Locale('id')), 'Selamat datang');
+    expect(config.content.heroTitleFor(const Locale('id')),
+        'Kelola semuanya dalam satu tempat');
+    expect(config.content.appDescriptionFor(const Locale('en')),
+        'A modern app for daily life.');
+    expect(config.contentFor(const Locale('id')).welcomeTitle,
+        'Selamat datang');
+  });
+
   test('AppConfig builds light and dark themes with bundled font', () {
-    const config = AppConfig(appName: 'Demo', packageId: 'com.demo');
+    final config = AppConfig(appName: 'Demo', packageId: 'com.demo');
     expect(config.effectiveFontFamily, 'Poppins');
     expect(config.lightTheme().colorScheme.brightness, Brightness.light);
     expect(config.darkTheme().colorScheme.brightness, Brightness.dark);
@@ -69,7 +127,7 @@ void main() {
     await storage.init();
     final controller = ThemeController(
       storage,
-      const AppConfig(appName: 'Demo', packageId: 'com.demo'),
+      AppConfig(appName: 'Demo', packageId: 'com.demo'),
     );
 
     controller.setThemeMode(ThemeMode.dark);
@@ -86,7 +144,7 @@ void main() {
     await storage.clear();
     final controller = ThemeController(
       storage,
-      const AppConfig(appName: 'Demo', packageId: 'com.demo'),
+      AppConfig(appName: 'Demo', packageId: 'com.demo'),
     );
 
     expect(controller.seedColor, const Color(0xFF4F46E5));
@@ -105,7 +163,7 @@ void main() {
     await storage.clear();
     final controller = ThemeController(
       storage,
-      const AppConfig(appName: 'Demo', packageId: 'com.demo'),
+      AppConfig(appName: 'Demo', packageId: 'com.demo'),
     );
 
     expect(controller.fontSize, AppFontSize.normal);
@@ -125,7 +183,7 @@ void main() {
   test('LocaleController resolves a supported locale', () async {
     final storage = StorageService();
     await storage.init();
-    const config = AppConfig(
+    final config = AppConfig(
       appName: 'Demo',
       packageId: 'com.demo',
       supportedLocales: [Locale('en'), Locale('id')],
@@ -281,7 +339,7 @@ void main() {
         _pump(
           const AboutScreen(),
           storage: storage,
-          config: const AppConfig(
+          config: AppConfig(
             appName: 'Demo App',
             packageId: 'com.demo',
             description: 'A demo application.',
@@ -317,7 +375,7 @@ void main() {
         _pump(
           const SettingsScreen(extra: [ListTile(title: Text('Custom item'))]),
           storage: storage,
-          config: const AppConfig(
+          config: AppConfig(
             appName: 'Demo App',
             packageId: 'com.demo',
             supportedLocales: [Locale('en'), Locale('id')],

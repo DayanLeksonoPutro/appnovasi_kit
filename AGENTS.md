@@ -31,11 +31,11 @@ mengedit kode internal package?"* Jika tidak, desainnya salah.
 - Routing: **go_router**
 - i18n: `flutter_localizations` + `intl` (file `.arb`)
 - Font: font bundled di package (mis. Inter/Poppins) + override lewat `AppConfig`
-- Monetisasi: `google_mobile_ads`, `in_app_purchase`
+- Monetisasi: `in_app_purchase` (AdMob **tidak** disertakan; ditambahkan di app konsumen)
 - Permission: `permission_handler`
 - Lain: `share_plus`, `url_launcher`, `package_info_plus`
 
-> Repo ini **single package** (`appnovasi_kit`) + folder `example/`. Tidak pakai Melos
+> Repo ini **single package** (`appnovasi_kit`) + folder `project/example/`. Tidak pakai Melos
 > kecuali nanti benar-benar perlu multi-package.
 
 ## 4. Struktur folder (feature-first ringan)
@@ -45,13 +45,13 @@ lib/
   appnovasi_kit.dart      # BARREL publik — satu-satunya pintu keluar API
   src/
     core/                 # AppConfig, AppKit, AppKitApp, DI/registry provider, util
-    services/             # storage, theme, locale, ads, iap, share, rate, permission
+    services/             # storage, theme, locale, iap, share, rate, permission
     features/             # modul feature-first (onboarding, about, settings, ...)
-    widgets/              # widget bersama (ShareButton, RateButton, AdBanner)
+    widgets/              # widget bersama (ShareButton, RateButton, AppTitle)
     routing/              # konfigurasi go_router + guard
   l10n/                   # file .arb + gen/ (generated, jangan diedit manual)
 assets/fonts/             # font bundled (Poppins)
-example/                  # app konsumen contoh (bukti integrasi config-only)
+project/example/     # app konsumen contoh (bukti integrasi config-only)
 test/
 ```
 
@@ -59,12 +59,12 @@ Aturan:
 - `src/` bersifat **private**. Hanya boleh diekspos lewat barrel `lib/appnovasi_kit.dart`.
 - Apa pun yang tidak ada di barrel = internal, bebas diubah tanpa menyentuh versioning breaking.
 - Feature-first: tiap feature memiliki provider, widget, dan model sendiri.
-- Hindari single-file `main.dart` besar. Single-file hanya boleh untuk `example/`.
+- Hindari single-file `main.dart` besar. Single-file hanya boleh untuk `project/example/`.
 
 ## 5. Kontrak API publik (yang dilihat consumer)
 
 Permukaan API yang boleh dipakai consumer:
-- `AppKit.initialize(AppConfig config)` — setup awal (ads, storage, iap).
+- `AppKit.initialize(AppConfig config)` — setup awal (storage, app info, iap).
 - `AppKitApp(...)` — root widget pembungkus `MaterialApp` (theme, locale, router).
 - Widget siap pakai: `ShareButton`, `RateButton`, `ShareIconButton`, `RateIconButton`
   (untuk `AppBar.actions`), `OnboardingScreen`, `OnboardingGate`, `AppShell`,
@@ -74,7 +74,7 @@ Permukaan API yang boleh dipakai consumer:
 - Routing: `AppRouter.create` (manual) & `AppRouter.createShell` (bottom nav
   `StatefulShellRoute.indexedStack`).
 - Service yang diakses lewat Provider: `StorageService`, `ThemeController`
-  (mode light/dark/system + `AppColorTheme`), `LocaleController`, `AdService`,
+  (mode light/dark/system + `AppColorTheme`), `LocaleController`,
   `PurchaseService`, `PermissionService`, `LinkService` (url_launcher),
   `AppInfoService` (package_info_plus).
 
@@ -92,8 +92,8 @@ Semua nilai yang berbeda antar-app HARUS lewat `AppConfig`, tidak boleh hardcode
 - Font: `fontFamily` (default dari package, consumer boleh override), `fonts`
   (`AppFont`; default `defaultFonts`), `defaultFontSize` (`AppFontSize`)
 - Locale: `supportedLocales`, `defaultLocale`
-- AdMob: `bannerUnitId`, `interstitialUnitId`, `appOpenUnitId`, (android/ios terpisah)
 - IAP: daftar `productIds`
+- ~~AdMob~~: **tidak ada** — ditambahkan di app konsumen saat siap listing (lihat §13).
 - Store: `playStoreUrl`, `appStoreUrl`, `moreAppsUrl`, `websiteUrl`,
   `privacyPolicyUrl`, `termsUrl`
 - Onboarding: `onboarding` (`OnboardingConfig` berisi daftar `OnboardingPage`)
@@ -103,7 +103,7 @@ Package sudah menyediakan **theme default & font bundled**, jadi consumer hanya 
 mengoverride lewat `AppConfig` bila ingin berbeda (config-only).
 
 **Jangan pernah** menaruh ID rahasia/API key langsung di `lib/` atau commit ke repo.
-Nilai non-rahasia (AdMob unit ID, product ID) tetap lewat `AppConfig` agar konsisten.
+Nilai non-rahasia (product ID) tetap lewat `AppConfig` agar konsisten.
 
 ## 7. Konvensi kode
 
@@ -151,22 +151,22 @@ flutter gen-l10n                 # regenerate lokalisasi
 Do:
 - Tambah API lewat barrel `appnovasi_kit.dart`.
 - Bungkus semua config ke `AppConfig`.
-- Jaga `example/` tetap bisa jalan sebagai bukti integrasi.
+- Jaga `project/example/` tetap bisa jalan sebagai bukti integrasi.
 
 Don't:
 - Mengekspor file `src/` langsung dari luar barrel.
-- Hardcode AdMob/product ID/secret di `lib/`.
+- Hardcode product ID/secret di `lib/`.
 - Menambah dependency berat tanpa alasan.
 - Mengubah API publik tanpa bump versi & changelog.
 
 ## 12. Secrets
 
 - Signing key, keystore, API key → TIDAK di repo; dokumentasikan di `docs/`.
-- Android/iOS app ID AdMob diletakkan di manifest native app konsumen, bukan package.
+- Android/iOS app ID AdMob (jika dipakai) diletakkan di manifest native app konsumen, bukan package.
 
 ## 13. Cara pakai untuk consumer (config-only)
 
-Contoh `example/` adalah bukti integrasi. Alur tiap project baru:
+Contoh `project/example/` adalah bukti integrasi. Alur tiap project baru:
 
 1. `flutter create --org com.appnovasi project_baru`
 2. Tambahkan dependency:
@@ -179,7 +179,6 @@ Contoh `example/` adalah bukti integrasi. Alur tiap project baru:
      packageId: 'com.appnovasi.project_baru',
      supportedLocales: [Locale('en'), Locale('id')],
      defaultLocale: Locale('en'),
-     bannerUnitId: 'ca-app-pub-xxx/yyy',
      productIds: ['remove_ads'],
      playStoreUrl: 'https://play.google.com/store/apps/details?id=...',
      onboarding: OnboardingConfig(
@@ -220,13 +219,14 @@ Contoh `example/` adalah bukti integrasi. Alur tiap project baru:
    }
    ```
    Tanpa `navigation`, cukup `AppKitApp(config: appConfig, home: HomePage())`.
-5. Pakai widget/service siap pakai, mis. `ShareButton`, `RateButton`, `AdBanner`,
+5. Pakai widget/service siap pakai, mis. `ShareButton`, `RateButton`,
    `AboutScreen`, `SettingsScreen`, `AppTitle` (judul appbar "NamaApp versi"),
    `context.read<ThemeController>().toggle()`, `context.read<LocaleController>()`.
 
 Langkah native yang tetap manual per-project (tidak bisa di package):
 - AdMob **App ID** di `AndroidManifest.xml` (`com.google.android.gms.ads.APPLICATION_ID`)
-  dan `Info.plist` (`GADApplicationIdentifier`).
+  dan `Info.plist` (`GADApplicationIdentifier`) — hanya bila app konsumen sudah memakai
+  `google_mobile_ads`.
 - Permission `permission_handler`: deklarasikan `<uses-permission>` di `AndroidManifest.xml`
   dan usage description (mis. `NSCameraUsageDescription`) di `Info.plist` sesuai kebutuhan.
   Set `compileSdk` Android minimal 37 (`compileSdk = maxOf(flutter.compileSdkVersion, 37)`).

@@ -6,7 +6,6 @@ import '../features/onboarding/onboarding_controller.dart';
 import '../features/onboarding/onboarding_gate.dart';
 import '../routing/app_routes.dart';
 import '../routing/app_shell.dart';
-import '../services/ad_service.dart';
 import '../services/app_info_service.dart';
 import '../services/link_service.dart';
 import '../services/locale_controller.dart';
@@ -72,7 +71,6 @@ class AppKitApp extends StatelessWidget {
         Provider<ShareService>(create: (_) => ShareService(_config)),
         Provider<RateService>(create: (_) => RateService(_config)),
         Provider<LinkService>(create: (_) => const LinkService()),
-        Provider<AdService>(create: (_) => AdService(_config)),
         Provider<PermissionService>(create: (_) => const PermissionService()),
         ChangeNotifierProvider<OnboardingController>(
           create: (_) => OnboardingController(AppKit.storage),

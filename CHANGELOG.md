@@ -1,3 +1,18 @@
+## 0.3.0
+
+* **BREAKING** — AdMob dihapus sepenuhnya dari package demi percepatan uji kelayakan
+  dan listing lebih cepat. Monetisasi iklan sekarang dipasang di app konsumen.
+* Dependency `google_mobile_ads` dihapus dari `pubspec.yaml`.
+* API publik yang dihapus: `AdService`, `AdBanner`, dan field `AppConfig.bannerUnitId`,
+  `AppConfig.interstitialUnitId`, `AppConfig.appOpenUnitId`, `AppConfig.hasAds`.
+* `AppKit.initialize` tidak lagi memanggil inisialisasi AdMob; `AppKitApp` tidak lagi
+  mendaftarkan provider `AdService`.
+* `project/example/` sekarang menjadi lokasi example app (dipindah dari `example/`);
+  `AndroidManifest.xml` dan `Info.plist` example sudah dibersihkan dari AdMob App ID.
+* Cara menambahkan AdMob nanti: tambahkan `google_mobile_ads` di app konsumen, isi App ID
+  di `AndroidManifest.xml` / `Info.plist`, lalu bungkus sendiri widget banner-nya.
+* In-App Purchase (`in_app_purchase`) tetap tersedia.
+
 ## 0.2.0
 
 * `PermissionService` (berbasis `permission_handler`) + re-export `Permission`,

@@ -34,3 +34,8 @@ migrate_working_dir/
 *.jks
 *.keystore
 **/key.properties
+
+# Workspace MVP: hanya project/example yang ikut repo
+# (project/pasfoto, project/rabbangunan, dst. diabaikan)
+/project/*
+!/project/example

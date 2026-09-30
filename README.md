@@ -4,31 +4,34 @@ Flutter boilerplate framework untuk mempercepat pembuatan app Play Store.
 Integrasi **config-only**: tambahkan dependency, isi satu `AppConfig`, aplikasi langsung siap setengah jalan.
 
 - Package publik: `appnovasi_kit`
-- Contoh integrasi lengkap: folder [`example/`](example/)
+- Contoh integrasi lengkap: folder [`project/example/`](project/example/)
 
 ## Fitur
 
-- Tema Material 3: mode **light/dark/system**, **8 warna tema** universal, **ukuran font**
-  (small/default/large), dan **jenis font** — semuanya bisa diganti user dari Settings.
-- Font **Poppins** bundled; seed color, font, dan daftar pilihannya bisa dioverride lewat `AppConfig`.
-- Multi-bahasa (i18n) EN/ID, locale dapat dipilih user.
+- Brand layer configurable via `BrandConfig` untuk nama app, slogan, logo, URL legal, dan kontak support.
+- Theme layer configurable via `ThemeConfig` untuk warna primer, background, sistem light/dark,
+  ukuran font, radius, serta preset font yang bisa dipilih user dari `SettingsScreen`.
+- Content layer configurable via `ContentConfig` untuk copy seperti welcome text, hero text,
+  deskripsi app, dan legal text dengan dukungan multi-bahasa.
+- Font preset bundled: `Default`, `Inter`, `Poppins`, `Manrope`, `Lexend`, `Serif`, `Monospace`.
+- Multi-bahasa (i18n) via `supportedLocales` + `defaultLocale`, dengan content yang bisa dipilih per locale.
 - Storage lokal **Hive** (satu-satunya storage).
 - **Onboarding** config-only (tampil sekali, tersimpan otomatis).
 - **Bottom navigation** otomatis via go_router `StatefulShellRoute.indexedStack`.
 - **Permission** (`permission_handler`) dibungkus `PermissionService`.
 - **AboutScreen** & **SettingsScreen** siap pakai.
-- AdMob (banner, interstitial, app open) & in-app purchase.
+- In-app purchase (`in_app_purchase`).
 - Widget siap pakai: `ShareButton`, `ShareIconButton`, `RateButton`, `RateIconButton`,
-  `AdBanner`, `AppTitle`, `AppVersionText`.
+  `AppTitle`, `AppVersionText`.
 - Service via Provider: `StorageService`, `ThemeController`, `LocaleController`,
   `PermissionService`, `LinkService` (url_launcher), `AppInfoService` (package_info_plus),
-  `AdService`, `PurchaseService`, `ShareService`, `RateService`.
+  `PurchaseService`, `ShareService`, `RateService`.
 
 ## Instalasi
 
 ```yaml
 dependencies:
-  appnovasi_kit: ^0.2.0
+  appnovasi_kit: ^0.3.0
 ```
 
 Saat pengembangan (lokal):
@@ -47,26 +50,51 @@ dependencies:
    import 'package:appnovasi_kit/appnovasi_kit.dart';
    import 'package:flutter/material.dart';
 
-   const appConfig = AppConfig(
-     appName: 'Project Baru',
-     packageId: 'com.appnovasi.project_baru',
-     description: 'Deskripsi singkat aplikasi.',
-     logoAsset: 'assets/logo.png', // opsional
-     supportedLocales: [Locale('en'), Locale('id')],
-     defaultLocale: Locale('en'),
-     // AdMob
-     bannerUnitId: 'ca-app-pub-xxx/yyy',
-     interstitialUnitId: 'ca-app-pub-xxx/zzz',
-     // IAP
-     productIds: ['remove_ads'],
-     // Store & tautan
+   final appConfig = AppConfig(
+     brand: BrandConfig(
+       appName: 'Project Baru',
+       packageId: 'com.appnovasi.project_baru',
+       description: 'Deskripsi singkat aplikasi.',
+       logoAsset: 'assets/logo.png',
+       slogan: 'Kelola semuanya dengan mudah',
+       supportEmail: 'hello@projectbaru.app',
+       websiteUrl: 'https://example.com',
+       privacyPolicyUrl: 'https://example.com/privacy',
+       termsUrl: 'https://example.com/terms',
+     ),
+     theme: ThemeConfig(
+       seedColor: const Color(0xFF4F46E5),
+       primary: const Color(0xFF4F46E5),
+       secondary: const Color(0xFF0EA5E9),
+       background: const Color(0xFFF8FAFC),
+       surface: Colors.white,
+       textPrimary: const Color(0xFF0F172A),
+       textSecondary: const Color(0xFF475569),
+       defaultThemeMode: ThemeMode.system,
+       defaultFontSize: AppFontSize.normal,
+       fontFamily: 'Poppins',
+     ),
+     content: ContentConfig(
+       welcomeTitle: const LocalizedText({
+         'en': 'Welcome',
+         'id': 'Selamat datang',
+       }),
+       heroTitle: const LocalizedText({
+         'en': 'Manage everything in one place',
+         'id': 'Kelola semuanya dalam satu tempat',
+       }),
+       appDescription: const LocalizedText({
+         'en': 'A modern app for daily life.',
+         'id': 'Aplikasi modern untuk kehidupan sehari-hari.',
+       }),
+       supportEmail: 'hello@projectbaru.app',
+     ),
+     supportedLocales: const [Locale('en'), Locale('id')],
+     defaultLocale: const Locale('en'),
+     productIds: const ['remove_ads'],
      playStoreUrl: 'https://play.google.com/store/apps/details?id=...',
      appStoreUrl: 'https://apps.apple.com/app/id...',
      moreAppsUrl: 'https://play.google.com/store/apps/developer?id=...',
-     websiteUrl: 'https://example.com',
-     privacyPolicyUrl: 'https://example.com/privacy',
-     termsUrl: 'https://example.com/terms',
-     // Onboarding (opsional)
      onboarding: OnboardingConfig(
        pages: [
          OnboardingPage(
@@ -76,7 +104,6 @@ dependencies:
          ),
        ],
      ),
-     // Bottom navigation (opsional)
      navigation: BottomNavConfig(
        tabs: [
          NavTab(
@@ -177,20 +204,38 @@ if (await permission.ensure(Permission.camera)) {
 ## Kustomisasi tampilan
 
 ```dart
-const appConfig = AppConfig(
-  appName: 'App',
-  packageId: 'com.app',
-  seedColor: Color(0xFF0EA5E9), // warna default
-  colorThemes: [ // pilihan warna yang tampil di Settings
-    AppColorTheme(name: 'Brand', seedColor: Color(0xFF0EA5E9)),
-    AppColorTheme(name: 'Emerald', seedColor: Color(0xFF10B981)),
+final appConfig = AppConfig(
+  brand: BrandConfig(
+    appName: 'App',
+    packageId: 'com.app',
+  ),
+  theme: ThemeConfig(
+    seedColor: const Color(0xFF0EA5E9),
+    primary: const Color(0xFF0EA5E9),
+    background: const Color(0xFFF8FAFC),
+    surface: Colors.white,
+    defaultFontSize: AppFontSize.normal,
+    fontFamily: 'Poppins',
+  ),
+  content: ContentConfig(
+    welcomeTitle: const LocalizedText({
+      'en': 'Welcome',
+      'id': 'Selamat datang',
+    }),
+  ),
+  supportedLocales: const [Locale('en'), Locale('id')],
+  defaultLocale: const Locale('en'),
+  colorThemes: [
+    AppColorTheme(name: 'Brand', seedColor: const Color(0xFF0EA5E9)),
+    AppColorTheme(name: 'Emerald', seedColor: const Color(0xFF10B981)),
   ],
-  fonts: [ // pilihan jenis font
-    AppFont(name: 'Default'), // mengikuti fontFamily
-    AppFont(name: 'Serif', fontFamily: 'serif'),
+  fonts: const [
+    AppFont(name: 'Default'),
+    AppFont(name: 'Inter', fontFamily: 'Inter'),
+    AppFont(name: 'Poppins', fontFamily: 'Poppins'),
+    AppFont(name: 'Manrope', fontFamily: 'Manrope'),
+    AppFont(name: 'Lexend', fontFamily: 'Lexend'),
   ],
-  defaultFontSize: AppFontSize.normal,
-  fontFamily: 'Poppins', // font default package
 );
 ```
 
@@ -198,13 +243,16 @@ const appConfig = AppConfig(
 
 Beberapa hal tidak bisa dari package dan tetap diatur di app konsumen:
 
-- AdMob **App ID** di `AndroidManifest.xml` (`com.google.android.gms.ads.APPLICATION_ID`) dan
-  `Info.plist` (`GADApplicationIdentifier`).
 - `permission_handler`: deklarasikan `<uses-permission>` di `AndroidManifest.xml` dan usage
   description (mis. `NSCameraUsageDescription`) di `Info.plist`. Set `compileSdk` Android
   minimal 37 (`compileSdk = maxOf(flutter.compileSdkVersion, 37)`).
 - Android `minSdk` minimal 23.
 - Product ID IAP & signing dikonfigurasi di Play Console.
+
+> **Catatan AdMob:** package ini sengaja **tidak** membawa `google_mobile_ads`. Monetisasi
+> iklan ditambahkan langsung di app konsumen saat sudah siap listing, agar build lebih ringan
+> dan listing lebih cepat. Saat sudah siap: tambahkan `google_mobile_ads` di `pubspec.yaml` app,
+> isi App ID di `AndroidManifest.xml` / `Info.plist`, lalu bungkus sendiri widget banner-nya.
 
 ## Development
 
@@ -215,7 +263,7 @@ flutter test
 dart format .
 flutter gen-l10n
 
-cd example && flutter run -d <device>   # jalankan example app
+cd project/example && flutter run -d <device>   # jalankan example app
 ```
 
 ## Versi & rilis

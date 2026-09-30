@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../services/ad_service.dart';
 import '../services/app_info_service.dart';
 import '../services/storage_service.dart';
 import 'app_config.dart';
@@ -23,7 +22,6 @@ class AppKit {
     storage = StorageService();
     await storage.init();
     appInfo = await AppInfoService.load();
-    await AdService.initialize(config);
     _initialized = true;
   }
 }
