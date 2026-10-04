@@ -131,6 +131,24 @@ flutter build appbundle --release
 flutter gen-l10n                 # regenerate lokalisasi
 ```
 
+### Skill rilis app consumer
+
+Persiapan upload ke Google Play untuk app di `project/*` dikemas sebagai skill
+`.opencode/skills/store-release/` (audit → riset keyword/ASO → store listing → generate ikon →
+signing → checklist). Panggil lewat skill `store-release`, atau langsung:
+
+```bash
+bash .opencode/skills/store-release/scripts/audit.sh project/<app> --fast
+python3 .opencode/skills/store-release/scripts/store_tool.py validate project/<app>
+python3 .opencode/skills/store-release/scripts/store_tool.py render   project/<app>
+python3 .opencode/skills/store-release/scripts/store_tool.py web      project/<app>
+python3 .opencode/skills/store-release/scripts/generate_icons.py      project/<app>
+bash .opencode/skills/store-release/scripts/setup_signing.sh          project/<app>   # interaktif
+```
+
+Artefak per app tersimpan di `project/<app>/store/`. Detail aturan Play di
+`.opencode/skills/store-release/references/`.
+
 ## 9. Versioning & rilis
 
 - Ikuti **Semantic Versioning** (`MAJOR.MINOR.PATCH`).

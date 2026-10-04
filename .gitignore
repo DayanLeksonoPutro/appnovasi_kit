@@ -39,3 +39,9 @@ migrate_working_dir/
 # (project/pasfoto, project/rabbangunan, dst. diabaikan)
 /project/*
 !/project/example
+
+# android release signing (never commit)
+**/key.properties
+**/*.jks
+**/*.keystore
+.keys/
