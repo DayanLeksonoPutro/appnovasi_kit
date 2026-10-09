@@ -29,7 +29,7 @@ than one code unit in Play's counter — stay 3–4 characters under the limit i
 | App or game | App | No ads, no game mechanics |
 | App name / category / tags | from `store.json → app.*` | Category must match the real function (Photography, Tools, Productivity) |
 | Contact email | `store.json → contact.email` | Must be monitored. Support-address rejections are common. |
-| Privacy policy | `store.json → contact.privacy_policy_url` | Must match `BrandConfig.privacyPolicyUrl` in the app |
+| Privacy policy | `store.json → contact.privacy_policy_url` | Must match `BrandConfig.privacyPolicyUrl` in the app. Appnovasi house rule: always the shared `https://appnovasi.blogspot.com/p/privasi.html` |
 | External marketing | Yes/No | Only "Yes" if you actually run ads |
 
 ### Main store listing
@@ -39,7 +39,7 @@ than one code unit in Play's counter — stay 3–4 characters under the limit i
 | App name | Highest-value real estate. Put the *head* keyword first. Do not use the brand name alone. |
 | Short description | Above the fold in search results. Repeat the primary keyword — Play does not treat this as duplication. |
 | Full description | Play indexes this text. Use the customer's own words, not internal jargon. Front-load the first 170 characters (visible before "more"). |
-| Keyword field | Anything **not already in the title or the full description**. Duplicated keywords buy nothing. |
+| Keyword field | **Google Play has no keyword field.** Play indexes the app name (30), short description (80), full description (4,000) and the developer name — nothing else. The comma-separated keyword box is an App Store (iOS) field; pasting an iOS keyword export into a Play listing reads as spam and buys nothing. Secondary terms belong in the full description, once each, in real sentences. `store.json → listing.keywords` is kept only as a research log — Play Console has nowhere to paste it. |
 
 ### App content
 

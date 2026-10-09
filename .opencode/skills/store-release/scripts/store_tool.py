@@ -90,6 +90,21 @@ def cmd_validate(app_root: Path) -> int:
         elif value:
             notes.append(f"listing.{field}: {len(value)}/{limit} chars")
 
+    for loc in dig(data, "listing.localizations") or []:
+        if not isinstance(loc, dict) or not loc.get("locale"):
+            errors.append("listing.localizations entries need a 'locale'")
+            continue
+        locale = loc["locale"]
+        for field, limit in LIMITS.items():
+            value = loc.get(field) or ""
+            if value and len(value) > limit:
+                errors.append(
+                    f"localization {locale}: {field} is {len(value)} chars, Play limit is {limit}")
+            elif value:
+                notes.append(f"localization {locale}.{field}: {len(value)}/{limit} chars")
+        if not loc.get("full_description"):
+            warnings.append(f"localization {locale} has no full description")
+
     keywords = dig(data, "listing.keywords") or []
     if not isinstance(keywords, list):
         errors.append("listing.keywords must be a list of strings")
@@ -262,6 +277,8 @@ def cmd_render(app_root: Path) -> int:
 
 {screenshot_plan(listing)}
 
+{localizations_section(listing)}
+
 ## Data safety
 
 ```json
@@ -287,6 +304,18 @@ def cmd_render(app_root: Path) -> int:
     for name, content in files.items():
         (meta / name).write_text(content + "\n", encoding="utf-8")
         print(f"wrote {meta / name}")
+    for loc in listing.get("localizations") or []:
+        locale = str(loc.get("locale") or "unknown")
+        target = meta / locale
+        target.mkdir(parents=True, exist_ok=True)
+        loc_files = {
+            "title.txt": loc.get("title", ""),
+            "short_description.txt": loc.get("short_description", ""),
+            "full_description.txt": loc.get("full_description", ""),
+        }
+        for name, content in loc_files.items():
+            (target / name).write_text(str(content) + "\n", encoding="utf-8")
+            print(f"wrote {target / name}")
     return 0
 
 
@@ -297,6 +326,40 @@ def screenshot_plan(listing: dict) -> str:
     lines = ["## Screenshot plan", "", "| # | Frame (bold caption) | Shows |", "|---|---|---|"]
     for i, shot in enumerate(plan, start=1):
         lines.append(f"| {i} | {shot.get('caption', '')} | {shot.get('shows', '')} |")
+    return "\n".join(lines) + "\n"
+
+
+def localizations_section(listing: dict) -> str:
+    locs = listing.get("localizations") or []
+    if not locs:
+        return ""
+    lines = [
+        "## Localized store listings",
+        "",
+        "Play Console: Main store listing → each language gets its **own full budget**",
+        "(30 + 80 + 4,000). A locale you do not define gets Google's machine translation,",
+        "which costs conversion. Publish only the languages you actually support in-app.",
+        "",
+    ]
+    for loc in locs:
+        code = loc.get("locale", "?")
+        lines += [
+            f"### `{code}`",
+            "",
+            f"- App name ({len(loc.get('title', ''))}/30): `{loc.get('title', '')}`",
+            f"- Short description ({len(loc.get('short_description', ''))}/80): "
+            f"`{loc.get('short_description', '')}`",
+            f"- Full description ({len(loc.get('full_description', ''))}/4000), first 170 characters:",
+            "",
+            "```text",
+            str(loc.get("full_description", ""))[:170],
+            "```",
+            "",
+            "```text",
+            str(loc.get("full_description", "")),
+            "```",
+            "",
+        ]
     return "\n".join(lines) + "\n"
 
 
@@ -404,18 +467,22 @@ def cmd_web(app_root: Path) -> int:
     data_collected = _legal_block(data, "data_collected", [])
     data_shared = _legal_block(data, "data_shared", [])
 
-    local_note = (
+    local_note = _legal_block(
+        data,
+        "intro_note",
         "Semua foto dan dokumen diproses sepenuhnya di perangkat Anda. Konten tersebut "
         "tidak pernah diunggah ke server kami, karena aplikasi ini tidak memiliki server."
         if offline
-        else "Konten yang Anda proses hanya digunakan untuk menjalankan fitur yang Anda minta."
+        else "Konten yang Anda proses hanya digunakan untuk menjalankan fitur yang Anda minta.",
     )
-    network_note = (
+    network_note = _legal_block(
+        data,
+        "network_note",
         "Aplikasi ini tidak meminta izin <code>INTERNET</code> untuk fungsi intinya dan dapat "
         "bekerja sepenuhnya offline."
         if offline
         else "Aplikasi dapat menggunakan koneksi internet terbatas (misalnya untuk pembelian "
-        "dalam aplikasi melalui Google Play); konten foto/dokumen tidak dikirim."
+        "dalam aplikasi melalui Google Play); konten foto/dokumen tidak dikirim.",
     )
     third_party = _legal_block(
         data,

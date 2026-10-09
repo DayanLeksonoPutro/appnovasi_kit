@@ -27,6 +27,7 @@ All scripts live next to this file; run them from anywhere with absolute paths.
 | `scripts/store_tool.py links <app-root>` | HTTP-check every URL in store.json (privacy policy must resolve) |
 | `scripts/store_tool.py web <app-root>` | Generate `store/web/privacy.html` + `terms.html` from store.json |
 | `scripts/generate_icons.py <app-root>` | brand.json → launcher icons (all densities + adaptive) + Play 512 icon + 1024×500 feature graphic |
+| `scripts/aso_kit.py <app-root>` | ASO pre-upload kit: keyword token audit + Play listing mock + 5-second conversion smoke-test harness |
 
 Requirements: `flutter`, `python3`, `Pillow` (`python3 -m pip install Pillow`).
 
@@ -44,6 +45,10 @@ Requirements: `flutter`, `python3`, `Pillow` (`python3 -m pip install Pillow`).
     assets/               # icon_512.png, feature_graphic_1024x500.png, screenshots/
     web/privacy.html      # ready-to-host legal pages
     web/terms.html
+    aso-test/
+        keyword-token-audit.md   # research terms vs. what Play can actually index
+        listing-preview.html     # mock of search card + listing header + screenshot strip
+        cvr-smoke-test.html      # 5-second exposure + questionnaire, exports CSV
 ```
 
 ## Workflow
@@ -101,6 +106,30 @@ Two decisions cannot be inferred and are irreversible once shipped:
 2. **Where the privacy policy is hosted.** The URL must resolve. If the user's domain does not
    resolve, produce placeholder URLs plus a hosting checklist — never ship a guess.
 
+   **Appnovasi house rule (settled 2026-10-08 — do not re-ask).** Every Appnovasi consumer app
+   points at the two shared Blogspot pages, no exceptions and no per-app hosting:
+
+   ```dart
+   privacyPolicyUrl: 'https://appnovasi.blogspot.com/p/privasi.html',
+   termsUrl: 'https://appnovasi.blogspot.com/p/syarat-ketentuan.html',
+   ```
+
+   | Purpose | Canonical URL |
+   |---|---|
+   | Privacy policy | `https://appnovasi.blogspot.com/p/privasi.html` |
+   | Terms & conditions | `https://appnovasi.blogspot.com/p/syarat-ketentuan.html` |
+
+   Use the same two URLs in `store.json → contact.privacy_policy_url` / `terms_url`, in
+   `BrandConfig`, and in the checklist. `store_tool.py links` must report HTTP 200 for both.
+
+   **Known gap — flag it, do not silently ship it.** The shared policy is one generic page for the
+   whole studio. As written it lists `INTERNET` + `ACCESS_NETWORK_STATE` as used permissions and
+   says the studio "berhak menggunakan data dan informasi para pengguna" for service improvement.
+   That contradicts every Appnovasi app that ships with the network permissions stripped and
+   Data safety = collects nothing. Play compares the privacy policy against the manifest and the
+   Data safety form. Record the mismatch in `store/upload-checklist.md` and ask the user to add a
+   per-app permissions block to the page before that app's first production release.
+
 Everything else: decide, implement, and record the decision in `store/upload-checklist.md`.
 
 ### 4. Fix the native build
@@ -121,6 +150,23 @@ git-ignored.
 Follow `references/aso-playbook.md`. Use `websearch` to harvest the query space and the competitor
 snapshot; do not guess keyword volumes. Write `store/keyword-research.md` with the query set,
 competitor snapshot, scored keyword table, chosen title, and the rejected terms with reasons.
+
+**Verify the snapshot against the live store, not from memory.** Play search pages are server-rendered
+and parseable: `https://play.google.com/store/search?q=<query>&c=apps&gl=ID&hl=id` gives ranked results,
+and each app's detail page (`…/store/apps/details?id=<pkg>`) exposes its install bucket
+(`class="ClM7O"`) and review count (`class="EHUI5b"`). Do that before publishing the competitor table —
+it catches name collisions and query traps that web search never shows.
+
+Then run the pre-upload ASO kit:
+
+```bash
+python3 scripts/aso_kit.py <app-root>
+```
+
+It writes `store/aso-test/`: a token audit (Play has no keyword field, so every researched term must
+occur as a token in the app name / short description / full description), a listing mock, and a
+5-second conversion smoke-test harness. Conversion rate is the lever a small app controls most and it
+can be measured with 20 people long before a Store Listing Experiment becomes eligible.
 
 ### 6. Write the listing
 

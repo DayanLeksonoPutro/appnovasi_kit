@@ -10,28 +10,21 @@ final appConfig = AppConfig(
     slogan: 'Build faster. Launch smarter.',
     supportEmail: 'hello@appnovasi.example',
     websiteUrl: 'https://example.com',
-    privacyPolicyUrl: 'https://example.com/privacy',
-    termsUrl: 'https://example.com/terms',
+    privacyPolicyUrl: 'https://appnovasi.blogspot.com/p/privasi.html',
+    termsUrl: 'https://appnovasi.blogspot.com/p/syarat-ketentuan.html',
     playStoreUrl:
         'https://play.google.com/store/apps/details?id=com.appnovasi.example',
     appStoreUrl: 'https://apps.apple.com/app/id000000000',
     moreAppsUrl: 'https://play.google.com/store/apps/developer?id=Appnovasi',
   ),
   theme: ThemeConfig(
-    seedColor: const Color(0xFF4F46E5),
+    accentColor: const Color(0xFF4F46E5),
     defaultThemeMode: ThemeMode.system,
     defaultFontSize: AppFontSize.normal,
     fontFamily: 'Poppins',
-    primary: const Color(0xFF4F46E5),
-    secondary: const Color(0xFF0EA5E9),
-    background: const Color(0xFFF8FAFC),
-    surface: Colors.white,
-    surfaceVariant: const Color(0xFFE2E8F0),
     success: const Color(0xFF16A34A),
     warning: const Color(0xFFF59E0B),
     error: const Color(0xFFDC2626),
-    textPrimary: const Color(0xFF0F172A),
-    textSecondary: const Color(0xFF475569),
     radiusMedium: 14,
     buttonHeight: 48,
   ),
@@ -133,9 +126,7 @@ class HomePage extends StatelessWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: [
-          Text(l10n.shareMessage(appConfig.appName)),
-        ],
+        children: [Text(l10n.shareMessage(appConfig.appName))],
       ),
     );
   }

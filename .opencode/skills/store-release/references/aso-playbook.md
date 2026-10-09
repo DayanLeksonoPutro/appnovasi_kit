@@ -30,12 +30,21 @@ of a specific high-intent query, get an install, survive the first session, get 
 
 ## Play-specific mechanics
 
-- Play **indexes the title, the short description, the full description, and the keyword field**.
-  It does not index the developer name, the category, or the privacy policy.
-- Play does **not** penalise keyword repetition between title, short description and keyword field
-  the way the App Store does — repeat the head term in title + short description.
-- The keyword field only pays off for terms **not already present** in title or description.
-- Keyword field separator: commas; spaces count as separators too. No # symbols needed.
+- Play **indexes the app name (30), the short description (80), the full description (4,000), and
+  the developer name**. It does not index the category, the tags, or the privacy policy.
+- **Play has no keyword field.** There is no comma-separated box in Play Console, no character
+  budget for it, and no "terms not in your title" trick — that is iOS. A Play keyword strategy is
+  therefore a *sentence* strategy: every term you want to rank for has to appear in the name, the
+  short description or the full description. Treat `store.json → listing.keywords` as a research
+  log and a checklist for what must appear in the copy, never as a field to paste into the console.
+- Play does **not** penalise keyword repetition between title, short description and full
+  description the way the App Store does — repeat the head term in title + short description.
+- Two thirds of the free-description budget is usually unused: 4,000 characters is the ceiling, not
+  a quota, but unused budget on a long-tail utility is wasted ranking surface. Google still asks
+  for natural language, not a comma list, so expand with real sentences that answer questions.
+- Every language you publish gets its **own full budget** (30 + 80 + 4,000). If you only define one
+  language, Google machine-translates the rest, and machine-translated copy costs you conversion.
+  Define the languages you actually support, per language.
 - Ranking depends heavily on **conversion rate** (icon + title + first screenshot) and on **retention
   signals** from Play Store listing performance. Rating velocity matters more than rating value.
 - Reviews: reply in the same language, within the first week, and answer the 1-star ones with a fix
