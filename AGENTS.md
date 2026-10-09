@@ -74,7 +74,7 @@ Permukaan API yang boleh dipakai consumer:
 - Routing: `AppRouter.create` (manual) & `AppRouter.createShell` (bottom nav
   `StatefulShellRoute.indexedStack`).
 - Service yang diakses lewat Provider: `StorageService`, `ThemeController`
-  (mode light/dark/system + `AppColorTheme`), `LocaleController`,
+  (mode light/dark/system + `accentColor`), `LocaleController`,
   `PurchaseService`, `PermissionService`, `LinkService` (url_launcher),
   `AppInfoService` (package_info_plus).
 
@@ -87,8 +87,13 @@ Aturan:
 Semua nilai yang berbeda antar-app HARUS lewat `AppConfig`, tidak boleh hardcode di `lib/`:
 
 - `appName`, `packageId`, `description`, `logoAsset`
-- Theme: `seedColor`, `colorThemes` (set warna universal bawaan `defaultColorThemes`),
-  `lightTheme`, `darkTheme`
+- Theme: **monochrome + brand accent**. `accentColor` = satu-satunya knob warna; dipakai penuh
+  hanya untuk aksi utama (`primary`/`onPrimary`/`primaryContainer`), ikon dekoratif, dan badge.
+  **Seluruh `Text` wajib pakai `onSurface`/`onSurfaceVariant` — jangan pernah `primary`,
+  `onPrimaryContainer`, `onTertiaryContainer`, atau warna lain untuk teks.** Permukaan &
+  teks selalu monokrom (hitam-di-atas-putih / putih-di-atas-hitam) dari
+  `lightNeutrals`/`darkNeutrals`; tidak ada override warna netral per-app.
+  Plus `lightTheme`, `darkTheme`
 - Font: `fontFamily` (default dari package, consumer boleh override), `fonts`
   (`AppFont`; default `defaultFonts`), `defaultFontSize` (`AppFontSize`)
 - Locale: `supportedLocales`, `defaultLocale`

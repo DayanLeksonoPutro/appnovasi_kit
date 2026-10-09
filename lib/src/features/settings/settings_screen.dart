@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
-import '../../core/app_color_theme.dart';
 import '../../core/app_config.dart';
 import '../../core/app_font.dart';
 import '../../core/app_font_size.dart';
@@ -63,21 +62,6 @@ class SettingsScreen extends StatelessWidget {
               }
             },
           ),
-          if (config.colorThemes.isNotEmpty)
-            _Row<AppColorTheme>(
-              icon: Icons.palette_outlined,
-              title: l10n.colorTheme,
-              value: theme.colorTheme,
-              items: [
-                for (final item in config.colorThemes)
-                  DropdownMenuItem(value: item, child: Text(item.name)),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  context.read<ThemeController>().setColorTheme(value);
-                }
-              },
-            ),
           _Row<AppFontSize>(
             icon: Icons.format_size_outlined,
             title: l10n.fontSize,

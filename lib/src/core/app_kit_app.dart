@@ -84,11 +84,11 @@ class AppKitApp extends StatelessWidget {
 
   Widget _buildApp(ThemeController theme, LocaleController locale) {
     final light = _config.lightTheme(
-      seedColor: theme.seedColor,
+      accentColor: theme.accentColor,
       fontFamily: theme.fontFamily,
     );
     final dark = _config.darkTheme(
-      seedColor: theme.seedColor,
+      accentColor: theme.accentColor,
       fontFamily: theme.fontFamily,
     );
     final homeWidget = home;

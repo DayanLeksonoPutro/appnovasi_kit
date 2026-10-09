@@ -10,6 +10,8 @@
 .svn/
 migrate_working_dir/
 
+app_briefs/
+
 # IntelliJ related
 *.iml
 *.ipr

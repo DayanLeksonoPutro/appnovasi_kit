@@ -88,7 +88,7 @@ class _Header extends StatelessWidget {
             child: Text(
               config.appName.isEmpty ? '?' : config.appName[0].toUpperCase(),
               style: theme.textTheme.headlineMedium?.copyWith(
-                color: theme.colorScheme.onPrimaryContainer,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),

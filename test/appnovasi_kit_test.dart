@@ -16,10 +16,8 @@ Widget _pump(
     buildNumber: '45',
   ),
 }) {
-  final resolvedConfig = config ?? AppConfig(
-    appName: 'Demo App',
-    packageId: 'com.demo',
-  );
+  final resolvedConfig =
+      config ?? AppConfig(appName: 'Demo App', packageId: 'com.demo');
 
   return MultiProvider(
     providers: [
@@ -67,23 +65,16 @@ void main() {
         slogan: 'Mudah bayar, aman, cepat',
       ),
       theme: ThemeConfig(
-        primary: Color(0xFF0F766E),
-        primaryContainer: Color(0xFFCCFBF1),
-        secondary: Color(0xFFEC4899),
-        background: Color(0xFFF8FAFC),
-        surface: Colors.white,
-        surfaceVariant: Color(0xFFE2E8F0),
+        accentColor: Color(0xFF0F766E),
         success: Color(0xFF16A34A),
         warning: Color(0xFFF59E0B),
         error: Color(0xFFDC2626),
-        textPrimary: Color(0xFF0F172A),
-        textSecondary: Color(0xFF475569),
       ),
     );
 
     expect(config.brand.appName, 'NusaPay');
     expect(config.brand.packageId, 'com.nusapay.app');
-    expect(config.theme.primary, const Color(0xFF0F766E));
+    expect(config.theme.accentColor, const Color(0xFF0F766E));
     expect(config.appName, 'NusaPay');
     expect(config.packageId, 'com.nusapay.app');
   });
@@ -106,13 +97,22 @@ void main() {
     );
 
     expect(config.content.welcomeTitleFor(const Locale('en')), 'Welcome');
-    expect(config.content.welcomeTitleFor(const Locale('id')), 'Selamat datang');
-    expect(config.content.heroTitleFor(const Locale('id')),
-        'Kelola semuanya dalam satu tempat');
-    expect(config.content.appDescriptionFor(const Locale('en')),
-        'A modern app for daily life.');
-    expect(config.contentFor(const Locale('id')).welcomeTitle,
-        'Selamat datang');
+    expect(
+      config.content.welcomeTitleFor(const Locale('id')),
+      'Selamat datang',
+    );
+    expect(
+      config.content.heroTitleFor(const Locale('id')),
+      'Kelola semuanya dalam satu tempat',
+    );
+    expect(
+      config.content.appDescriptionFor(const Locale('en')),
+      'A modern app for daily life.',
+    );
+    expect(
+      config.contentFor(const Locale('id')).welcomeTitle,
+      'Selamat datang',
+    );
   });
 
   test('AppConfig builds light and dark themes with bundled font', () {
@@ -138,7 +138,7 @@ void main() {
     expect(controller.themeMode, ThemeMode.light);
   });
 
-  test('ThemeController persists the selected color theme', () async {
+  test('ThemeController exposes the configured accent color', () async {
     final storage = StorageService();
     await storage.init();
     await storage.clear();
@@ -147,14 +147,65 @@ void main() {
       AppConfig(appName: 'Demo', packageId: 'com.demo'),
     );
 
-    expect(controller.seedColor, const Color(0xFF4F46E5));
+    expect(controller.accentColor, const Color(0xFF4F46E5));
 
-    final green = defaultColorThemes.firstWhere(
-      (theme) => theme.name == 'Green',
+    final branded = ThemeController(
+      storage,
+      AppConfig(
+        appName: 'Demo',
+        packageId: 'com.demo',
+        accentColor: const Color(0xFF10B981),
+      ),
     );
-    controller.setColorTheme(green);
-    expect(controller.seedColor, green.seedColor);
-    expect(storage.read<String>('color_theme'), 'Green');
+    expect(branded.accentColor, const Color(0xFF10B981));
+  });
+
+  test('theme keeps neutral surfaces and full-color accent', () {
+    const accent = Color(0xFF0EA5E9);
+    final config = AppConfig(
+      appName: 'Demo',
+      packageId: 'com.demo',
+      accentColor: accent,
+    );
+
+    for (final theme in [config.lightTheme(), config.darkTheme()]) {
+      final scheme = theme.colorScheme;
+      expect(scheme.primary, accent);
+      expect(scheme.onPrimary, Colors.white);
+      expect(theme.scaffoldBackgroundColor, isNot(accent));
+      expect(scheme.surfaceTint, Colors.transparent);
+    }
+
+    final light = config.lightTheme().colorScheme;
+    final dark = config.darkTheme().colorScheme;
+    expect(light.brightness, Brightness.light);
+    expect(dark.brightness, Brightness.dark);
+    expect(
+      config.darkTheme().scaffoldBackgroundColor.computeLuminance(),
+      lessThan(0.2),
+    );
+    expect(light.onSurface, Colors.black);
+    expect(dark.onSurface, Colors.white);
+    expect(light.surface, Colors.white);
+
+    for (final scheme in [light, dark]) {
+      expect(scheme.outline, isNot(Colors.white));
+      expect(scheme.outlineVariant, isNot(Colors.white));
+    }
+
+    for (final role in [
+      dark.surface,
+      dark.surfaceDim,
+      dark.surfaceBright,
+      dark.surfaceContainerLowest,
+      dark.surfaceContainerLow,
+      dark.surfaceContainer,
+      dark.surfaceContainerHigh,
+      dark.surfaceContainerHighest,
+    ]) {
+      expect(role, isNot(Colors.white));
+      expect(role.computeLuminance(), lessThan(0.3));
+    }
   });
 
   test('ThemeController persists font size and font family', () async {
@@ -385,7 +436,6 @@ void main() {
 
       expect(find.byType(DropdownButton<Locale>), findsOneWidget);
       expect(find.byType(DropdownButton<ThemeMode>), findsOneWidget);
-      expect(find.byType(DropdownButton<AppColorTheme>), findsOneWidget);
       expect(find.byType(DropdownButton<AppFontSize>), findsOneWidget);
       expect(find.byType(DropdownButton<AppFont>), findsOneWidget);
       expect(find.text('Custom item'), findsOneWidget);
@@ -395,22 +445,15 @@ void main() {
       );
       expect(mode.value, ThemeMode.system);
 
-      final color = tester.widget<DropdownButton<AppColorTheme>>(
-        find.byType(DropdownButton<AppColorTheme>),
-      );
-      expect(color.value?.name, 'Indigo');
-
       final size = tester.widget<DropdownButton<AppFontSize>>(
         find.byType(DropdownButton<AppFontSize>),
       );
       expect(size.value, AppFontSize.normal);
 
-      final green = defaultColorThemes.firstWhere((t) => t.name == 'Green');
       final serif = defaultFonts.firstWhere((f) => f.name == 'Serif');
 
       await tester.runAsync(() async {
         mode.onChanged!(ThemeMode.dark);
-        color.onChanged!(green);
         size.onChanged!(AppFontSize.large);
         tester
             .widget<DropdownButton<AppFont>>(
@@ -428,15 +471,6 @@ void main() {
             )
             .value,
         ThemeMode.dark,
-      );
-      expect(
-        tester
-            .widget<DropdownButton<AppColorTheme>>(
-              find.byType(DropdownButton<AppColorTheme>),
-            )
-            .value
-            ?.name,
-        'Green',
       );
       expect(
         tester

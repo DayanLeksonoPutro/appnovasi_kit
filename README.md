@@ -63,13 +63,7 @@ dependencies:
        termsUrl: 'https://example.com/terms',
      ),
      theme: ThemeConfig(
-       seedColor: const Color(0xFF4F46E5),
-       primary: const Color(0xFF4F46E5),
-       secondary: const Color(0xFF0EA5E9),
-       background: const Color(0xFFF8FAFC),
-       surface: Colors.white,
-       textPrimary: const Color(0xFF0F172A),
-       textSecondary: const Color(0xFF475569),
+       accentColor: const Color(0xFF4F46E5),
        defaultThemeMode: ThemeMode.system,
        defaultFontSize: AppFontSize.normal,
        fontFamily: 'Poppins',
@@ -197,11 +191,16 @@ if (await permission.ensure(Permission.camera)) {
 
 - `AboutScreen`: logo, versi (dari `package_info_plus`), deskripsi, share, rate, more apps,
   website, privacy policy, dan terms. Bisa ditambah item dengan `AboutScreen(extra: [...])`.
-- `SettingsScreen`: pilih mode tema (system/light/dark), warna tema, ukuran font, jenis font,
+- `SettingsScreen`: pilih mode tema (system/light/dark), ukuran font, jenis font,
   dan bahasa. Bisa ditambah item dengan `SettingsScreen(extra: [...])`.
 - `AppTitle` & `AppVersionText`: judul AppBar "NamaApp versi" dan label versi.
 
 ## Kustomisasi tampilan
+
+Tema bersifat **monochrome + brand accent**: seluruh teks dan permukaan selalu hitam-di-atas-putih
+(light) atau putih-di-atas-hitam (dark). Satu-satunya knob warna adalah `accentColor`, yang dipakai
+penuh hanya untuk aksi utama (tombol primary, chip accent, link). Override warna netral tidak
+disediakan, jadi tema gelap tidak akan pernah "bocor" warna putih.
 
 ```dart
 final appConfig = AppConfig(
@@ -210,10 +209,7 @@ final appConfig = AppConfig(
     packageId: 'com.app',
   ),
   theme: ThemeConfig(
-    seedColor: const Color(0xFF0EA5E9),
-    primary: const Color(0xFF0EA5E9),
-    background: const Color(0xFFF8FAFC),
-    surface: Colors.white,
+    accentColor: const Color(0xFF0EA5E9),
     defaultFontSize: AppFontSize.normal,
     fontFamily: 'Poppins',
   ),
@@ -225,10 +221,6 @@ final appConfig = AppConfig(
   ),
   supportedLocales: const [Locale('en'), Locale('id')],
   defaultLocale: const Locale('en'),
-  colorThemes: [
-    AppColorTheme(name: 'Brand', seedColor: const Color(0xFF0EA5E9)),
-    AppColorTheme(name: 'Emerald', seedColor: const Color(0xFF10B981)),
-  ],
   fonts: const [
     AppFont(name: 'Default'),
     AppFont(name: 'Inter', fontFamily: 'Inter'),

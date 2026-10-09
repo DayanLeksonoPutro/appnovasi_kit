@@ -130,7 +130,7 @@ final appConfig = AppConfig(
     supportEmail: 'hello@example.com',
   ),
   theme: ThemeConfig(
-    seedColor: const Color(0xFF4F46E5),
+    accentColor: const Color(0xFF4F46E5),
     defaultThemeMode: ThemeMode.system,
     defaultFontSize: AppFontSize.normal,
     fontFamily: 'Poppins',

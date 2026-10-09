@@ -188,12 +188,6 @@ abstract class AppLocalizations {
   /// **'About'**
   String get aboutTitle;
 
-  /// No description provided for @colorTheme.
-  ///
-  /// In en, this message translates to:
-  /// **'Color theme'**
-  String get colorTheme;
-
   /// No description provided for @fontSize.
   ///
   /// In en, this message translates to:

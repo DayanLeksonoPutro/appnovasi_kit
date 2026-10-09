@@ -57,9 +57,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About';
 
   @override
-  String get colorTheme => 'Color theme';
-
-  @override
   String get fontSize => 'Font size';
 
   @override

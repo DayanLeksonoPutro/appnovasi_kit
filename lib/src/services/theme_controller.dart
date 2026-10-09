@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_color_theme.dart';
 import '../core/app_config.dart';
 import '../core/app_font.dart';
 import '../core/app_font_size.dart';
@@ -11,14 +10,12 @@ class ThemeController extends ChangeNotifier {
     : _mode =
           _fromString(_storage.read<String>(_modeKey)) ??
           _config.defaultThemeMode,
-      _colorTheme = _resolveColor(_storage.read<String>(_colorKey), _config),
       _fontSize =
           _fromFontSize(_storage.read<String>(_fontSizeKey)) ??
           _config.defaultFontSize,
       _font = _resolveFont(_storage.read<String>(_fontKey), _config);
 
   static const String _modeKey = 'theme_mode';
-  static const String _colorKey = 'color_theme';
   static const String _fontSizeKey = 'font_size';
   static const String _fontKey = 'font_family';
 
@@ -26,15 +23,12 @@ class ThemeController extends ChangeNotifier {
   final AppConfig _config;
 
   ThemeMode _mode;
-  AppColorTheme _colorTheme;
   AppFontSize _fontSize;
   AppFont _font;
 
   ThemeMode get themeMode => _mode;
 
-  AppColorTheme get colorTheme => _colorTheme;
-
-  Color get seedColor => _colorTheme.seedColor;
+  Color get accentColor => _config.accentColor;
 
   AppFontSize get fontSize => _fontSize;
 
@@ -50,13 +44,6 @@ class ThemeController extends ChangeNotifier {
     if (_mode == mode) return;
     _mode = mode;
     _storage.write(_modeKey, mode.name);
-    notifyListeners();
-  }
-
-  void setColorTheme(AppColorTheme colorTheme) {
-    if (_colorTheme.name == colorTheme.name) return;
-    _colorTheme = colorTheme;
-    _storage.write(_colorKey, colorTheme.name);
     notifyListeners();
   }
 
@@ -92,19 +79,6 @@ class ThemeController extends ChangeNotifier {
       if (size.name == value) return size;
     }
     return null;
-  }
-
-  static AppColorTheme _resolveColor(String? name, AppConfig config) {
-    final themes = config.colorThemes.isEmpty
-        ? defaultColorThemes
-        : config.colorThemes;
-    for (final theme in themes) {
-      if (theme.name == name) return theme;
-    }
-    for (final theme in themes) {
-      if (theme.seedColor == config.seedColor) return theme;
-    }
-    return themes.first;
   }
 
   static AppFont _resolveFont(String? name, AppConfig config) {

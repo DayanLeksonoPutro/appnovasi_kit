@@ -4,7 +4,6 @@ export 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionStatus, PermissionWithService;
 
 export 'l10n/gen/app_localizations.dart';
-export 'src/core/app_color_theme.dart';
 export 'src/core/app_config.dart';
 export 'src/core/content_config.dart';
 export 'src/core/app_font.dart';

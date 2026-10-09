@@ -57,9 +57,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get aboutTitle => 'Tentang';
 
   @override
-  String get colorTheme => 'Warna tema';
-
-  @override
   String get fontSize => 'Ukuran font';
 
   @override

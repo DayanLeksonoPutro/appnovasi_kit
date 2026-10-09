@@ -1,3 +1,29 @@
+## 0.4.0
+
+* **BREAKING** — Theme disederhanakan jadi **monochrome + brand accent**. Seluruh warna teks dan
+  permukaan (background, surface, surface container, outline) monokrom: hitam di atas putih pada
+  light mode, putih di atas hitam pada dark mode. Tidak ada lagi warna brand pada teks.
+  Warna brand dipakai penuh hanya untuk aksi utama (`colorScheme.primary`, `onPrimary`,
+  `primaryContainer`) lewat satu knob `ThemeConfig.accentColor`. `surfaceTint` dinolkan supaya
+  permukaan tidak ikut mewarna.
+* Override warna netral dihapus karena menyebabkan kebocoran: `surface: Colors.white` di config
+  ikut diterapkan pada dark mode. Warna netral kini aset universal package dan tidak bisa
+  di-override per-app.
+* API publik yang dihapus: `AppColorTheme`, `defaultColorThemes`, `AppConfig.colorThemes`,
+  `ThemeConfig.seedColor`/`colorThemes`/`primary`/`primaryContainer`/`secondary`/`surfaceVariant`/
+  `background`/`surface`/`textPrimary`/`textSecondary`, `AppConfig.seedColor`/`colorThemes`,
+  `ThemeController.colorTheme`/`seedColor`/`setColorTheme`, dan
+  `ThemeConfig.lightTheme(seedColor:)`/`darkTheme(seedColor:)` — sekarang `accentColor:`.
+* Nilai baru: `ThemeConfig.defaultAccentColor` (`Color(0xFF4F46E5)`), `Neutrals` +
+  `lightNeutrals`/`darkNeutrals`, dan `ThemeController.accentColor`.
+* Teks di `AboutScreen` (avatar) dan consumer project tidak lagi memakai warna accent
+  (`onPrimaryContainer`/`onTertiaryContainer`/`primary`) — semua `Text` memakai `onSurface`
+  atau `onSurfaceVariant` agar tetap monokrom.
+* `SettingsScreen` tidak lagi menampilkan pemilih warna tema; hanya mode tema, ukuran font,
+  jenis font, dan bahasa. Key `colorTheme` dihapus dari `app_en.arb` & `app_id.arb`.
+* `project/example/`, `project/pasfoto/`, dan `project/rabbangunan/` sudah dimigrasikan ke
+  `accentColor`.
+
 ## 0.3.0
 
 * **BREAKING** — AdMob dihapus sepenuhnya dari package demi percepatan uji kelayakan
