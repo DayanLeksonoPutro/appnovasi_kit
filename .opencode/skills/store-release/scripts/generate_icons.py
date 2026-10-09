@@ -153,6 +153,16 @@ def draw_monogram(
         draw.text((size / 2, size / 2), text, fill=(255, 255, 255, 255), anchor="mm")
         canvas.alpha_composite(layer)
         return
+    # Height alone does not bound width: a wide acronym ("EXIF") at height_ratio
+    # 0.46 is ~1.15x the canvas and gets clipped left and right. Shrink the font
+    # until the advance fits inside the usable width, so a long monogram renders
+    # smaller instead of cropped. Bitmaps cannot scale, hence the single step down.
+    max_w = size * 0.86
+    advance = sum(font.getlength(ch) for ch in text) + tracking * target_h * (len(text) - 1)
+    if advance > max_w:
+        scale = max_w / advance
+        target_h = max(int(target_h * scale), 8)
+        font = fit_font(font_path, target_h)
     advance = 0.0
     glyphs = []
     for ch in text:
@@ -219,18 +229,33 @@ def feature_graphic(brand: dict, font_path: str | None) -> Image.Image:
             [(x, 0), (x, h)],
             fill=tuple(int(round(start[i] + (end[i] - start[i]) * t)) for i in range(3)),
         )
-    if brand.get("wordmark", True) and font_path:
-        label = brand["app_name"]
-        name_font = fit_font(font_path, 72)
-        name_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        ld = ImageDraw.Draw(name_layer)
-        bbox = ld.textbbox((0, 0), label, font=name_font)
-        text_w = bbox[2] - bbox[0]
-        ld.text(((w - text_w) / 2 - bbox[0], h / 2 - 26), label, font=name_font, fill=(255, 255, 255, 255))
-        img = Image.alpha_composite(img.convert("RGBA"), name_layer).convert("RGB")
     logo = play_icon_512(brand, font_path).resize((190, 190), Image.LANCZOS)
     if brand.get("wordmark", True) and font_path:
-        img.paste(logo, (w // 2 - 95, int(h / 2) - 150))
+        # Stack logo above wordmark. The old layout drew the wordmark at the
+        # vertical centre and pasted the 190px logo over the same rows, so the
+        # logo covered the app name.
+        logo_y = 96
+        img.paste(logo, (w // 2 - 95, logo_y))
+
+        label = brand["app_name"]
+        size = 76
+        while size > 24:
+            name_font = fit_font(font_path, size)
+            bbox = ImageDraw.Draw(Image.new("L", (1, 1))).textbbox((0, 0), label, font=name_font)
+            if bbox[2] - bbox[0] <= w * 0.72:
+                break
+            size -= 4
+        text_w = bbox[2] - bbox[0]
+        text_top = logo_y + 190 + 34
+        name_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(name_layer)
+        ld.text(
+            ((w - text_w) / 2 - bbox[0], text_top),
+            label,
+            font=name_font,
+            fill=(255, 255, 255, 255),
+        )
+        img = Image.alpha_composite(img.convert("RGBA"), name_layer).convert("RGB")
     else:
         img.paste(logo, (w // 2 - 95, h // 2 - 95))
     return img
